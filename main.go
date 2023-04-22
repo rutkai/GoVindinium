@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/geetarista/vindinium-starter-go/vindinium"
+	"go-vindinium/vindinium"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&client.Server, "s", "http://vindinium.org", "server")
+	flag.StringVar(&client.Server, "s", "http://vindinium.idealib.net", "server")
 	flag.StringVar(&client.Key, "k", "", "api key")
 	flag.StringVar(&client.Mode, "m", "arena", "mode (arena or training)")
 	flag.StringVar(&client.BotName, "b", "fighter", "name of bot to use")
