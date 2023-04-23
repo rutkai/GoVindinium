@@ -14,7 +14,7 @@ import (
 
 const (
 	MoveTimeout  = 15
-	StartTimeout = 10 * 60
+	StartTimeout = 0
 )
 
 type Client struct {
@@ -72,6 +72,9 @@ func (c *Client) post(uri string, values url.Values, seconds int) error {
 	}
 	timeout := time.Duration(seconds) * time.Second
 	dial := func(ctx context.Context, network, addr string) (net.Conn, error) {
+		if timeout == 0 {
+			return net.Dial(network, addr)
+		}
 		return net.DialTimeout(network, addr, timeout)
 	}
 
