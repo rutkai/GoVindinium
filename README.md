@@ -38,7 +38,7 @@ The remaining flags are optional:
 
 `-r` Use a random map in training mode. Setting to `false` can be useful to ensure consistency in training. Default: `true`
 
-`-s` The server to play against. Default: `http://vindinium.org`
+`-s` The server to play against. Default: `http://vindinium.idealib.net`
 
 `-d` Debug mode&mdash;verbose output for debugging and testing. Default: `false`
 

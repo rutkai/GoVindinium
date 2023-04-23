@@ -1,6 +1,7 @@
 package vindinium
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -18,10 +19,10 @@ const (
 
 var (
 	AIM = map[Direction]*Position{
-		"North": &Position{-1, 0},
-		"East":  &Position{0, 1},
-		"South": &Position{1, 0},
-		"West":  &Position{0, -1},
+		"North": {-1, 0},
+		"East":  {0, 1},
+		"South": {1, 0},
+		"West":  {0, -1},
 	}
 )
 
@@ -51,7 +52,8 @@ func (board *Board) parseTile(tile string) interface{} {
 	case TAVERN_TILE:
 		return TAVERN
 	case MINE_TILE:
-		id := string([]rune(tile)[1])
+		char := string([]rune(tile)[1])
+		id, _ := strconv.Atoi(char)
 		return &MineTile{id}
 	case HERO_TILE:
 		char := string([]rune(tile)[1])
@@ -78,7 +80,6 @@ func (board *Board) parseTiles() {
 	for xi, x := range matrix {
 		innerList := make([]interface{}, board.Size)
 		for xsi, xs := range x {
-
 			innerList[xsi] = board.parseTile(string(xs))
 		}
 		ts[xi] = innerList
@@ -88,8 +89,65 @@ func (board *Board) parseTiles() {
 }
 
 func (board *Board) Passable(loc Position) bool {
-	tile := board.Tileset[loc.X][loc.Y]
-	return tile == AIR
+	return board.Tileset[loc.X][loc.Y] == AIR
+}
+
+func (board *Board) Wall(loc Position) bool {
+	return board.Tileset[loc.X][loc.Y] == WALL
+}
+
+func (board *Board) Tavern(loc Position) bool {
+	return board.Tileset[loc.X][loc.Y] == TAVERN
+}
+
+func (board *Board) Mine(loc Position) (bool, *MineTile) {
+	switch tile := board.Tileset[loc.X][loc.Y]; tile.(type) {
+	case *MineTile:
+		return true, tile.(*MineTile)
+	default:
+		return false, nil
+	}
+}
+
+func (board *Board) Hero(loc Position) (bool, *HeroTile) {
+	switch tile := board.Tileset[loc.X][loc.Y]; tile.(type) {
+	case *HeroTile:
+		return true, tile.(*HeroTile)
+	default:
+		return false, nil
+	}
+}
+
+func (board *Board) HasNeighbouringHero(loc Position, myself int) bool {
+	// Direct neighbours
+	if isHero, hero := board.Hero(*board.To(loc, "North")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(loc, "South")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(loc, "East")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(loc, "West")); isHero && hero.Id != myself {
+		return true
+	}
+
+	// Neighbour corners
+	if isHero, hero := board.Hero(*board.To(*board.To(loc, "North"), "East")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(*board.To(loc, "East"), "South")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(*board.To(loc, "South"), "West")); isHero && hero.Id != myself {
+		return true
+	}
+	if isHero, hero := board.Hero(*board.To(*board.To(loc, "West"), "North")); isHero && hero.Id != myself {
+		return true
+	}
+
+	return false
 }
 
 func (board *Board) To(loc Position, direction Direction) *Position {
@@ -112,4 +170,25 @@ func (board *Board) To(loc Position, direction Direction) *Position {
 	}
 
 	return &Position{nRow, nCol}
+}
+
+func DirectionOf(from Position, to Position) Direction {
+	if AIM["North"].X+from.X == to.X && AIM["North"].Y+from.Y == to.Y {
+		return "North"
+	}
+	if AIM["South"].X+from.X == to.X && AIM["South"].Y+from.Y == to.Y {
+		return "South"
+	}
+	if AIM["West"].X+from.X == to.X && AIM["West"].Y+from.Y == to.Y {
+		return "West"
+	}
+	if AIM["East"].X+from.X == to.X && AIM["East"].Y+from.Y == to.Y {
+		return "East"
+	}
+	fmt.Println("ERROR: Invalid positions for direction calculation: ", from, to)
+	return "Stay"
+}
+
+func (pos *Position) IsValid(size int) bool {
+	return pos.X >= 0 && pos.Y >= 0 && pos.X < size && pos.Y < size
 }

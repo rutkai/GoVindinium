@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"go-vindinium/vindinium"
+	"govindinium/vindinium"
 )
 
 var (

@@ -2,6 +2,7 @@ package vindinium
 
 import (
 	"encoding/json"
+	"strconv"
 
 	. "gopkg.in/check.v1"
 )
@@ -34,7 +35,8 @@ func (s *BoardSuite) TestParse(c *C) {
 	c.Assert(s.board.Tileset[0][1], Equals, WALL)
 	c.Assert(s.board.Tileset[0][2], Equals, TAVERN)
 	gotMine := s.board.Tileset[0][3]
-	wantMine := &MineTile{string([]rune(s.board.Tiles)[7])}
+	tile, _ := strconv.Atoi(string([]rune(s.board.Tiles)[7]))
+	wantMine := &MineTile{tile}
 	c.Assert(gotMine, FitsTypeOf, &MineTile{})
 	c.Assert(gotMine.(*MineTile).HeroId, Equals, wantMine.HeroId)
 	id := tileToInt(s.board.Tiles, 9)

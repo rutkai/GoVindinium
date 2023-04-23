@@ -5,5 +5,5 @@ type HeroTile struct {
 }
 
 type MineTile struct {
-	HeroId string
+	HeroId int
 }

@@ -1,10 +1,11 @@
 package vindinium
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -48,6 +49,8 @@ func (c *Client) Setup() {
 	switch c.BotName {
 	case "fighter":
 		c.Bot = &FighterBot{}
+	case "introvert":
+		c.Bot = &IntrovertBot{}
 	default:
 		c.Bot = &RandomBot{}
 	}
@@ -68,11 +71,11 @@ func (c *Client) post(uri string, values url.Values, seconds int) error {
 		fmt.Printf("Making request to to: %s\n", uri)
 	}
 	timeout := time.Duration(seconds) * time.Second
-	dial := func(network, addr string) (net.Conn, error) {
+	dial := func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return net.DialTimeout(network, addr, timeout)
 	}
 
-	transport := http.Transport{Dial: dial}
+	transport := http.Transport{DialContext: dial}
 	client := http.Client{Transport: &transport}
 
 	response, err := client.PostForm(uri, values)
@@ -82,7 +85,7 @@ func (c *Client) post(uri string, values url.Values, seconds int) error {
 
 	defer response.Body.Close()
 
-	data, _ := ioutil.ReadAll(response.Body)
+	data, _ := io.ReadAll(response.Body)
 
 	if response.StatusCode >= 500 {
 		return errors.New(fmt.Sprintf("Server responded with %s", response.Status))
@@ -93,6 +96,7 @@ func (c *Client) post(uri string, values url.Values, seconds int) error {
 	if err := json.Unmarshal(data, &c.State); err != nil {
 		return err
 	}
+	c.State.Init()
 
 	if c.Debug {
 		fmt.Printf("Setting data to:\n%s\n", string(data))
@@ -111,7 +115,7 @@ func (c *Client) Start() error {
 		}
 	}
 
-	fmt.Println("Connecting and waiting for other players to join...")
+	fmt.Printf("Connecting to %s and waiting for other players to join...\n", c.Server)
 	return c.post(c.Url, values, StartTimeout)
 }
 

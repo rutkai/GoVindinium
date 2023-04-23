@@ -75,7 +75,7 @@ func (s *ClientSuite) TestStart_Arena(c *C) {
 		_ = r.FormValue("key")
 		_ = r.FormValue("turns")
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"game":{"id":"abc123","token":"xyz789","board":{"size":2,"tiles":"  ##[]$-"}},"playUrl":"server"}`)
+		fmt.Fprintln(w, `{"game":{"id":"abc123","board":{"size":2,"tiles":"  ##[]$-"}},"token":"xyz789","playUrl":"server"}`)
 	}
 	server := httptest.NewServer(http.HandlerFunc(handler))
 	defer server.Close()
@@ -92,7 +92,7 @@ func (s *ClientSuite) TestStart_Training(c *C) {
 		_ = r.FormValue("key")
 		_ = r.FormValue("turns")
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"game":{"id":"abc123","token":"xyz789","board":{"size":2,"tiles":"  ##[]$-"}},"playUrl":"server"}`)
+		fmt.Fprintln(w, `{"game":{"id":"abc123","board":{"size":2,"tiles":"  ##[]$-"}},"token":"xyz789","playUrl":"server"}`)
 	}
 	server := httptest.NewServer(http.HandlerFunc(handler))
 	defer server.Close()
