@@ -12,4 +12,4 @@ FROM debian:buster-slim
 
 COPY --from=builder /app/vindinium-warrior /app/vindinium-warrior
 
-CMD ["/app/vindinium-warrior"]
+ENTRYPOINT ["/app/vindinium-warrior"]
